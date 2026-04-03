@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>AgriSmart - Authentification</title>
+    <link rel="stylesheet" href="{% static 'AgriSmart/styles/auth.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="page-container">
+        <div class="auth-container">
+            <!-- Section Logo -->
+            <div class="brand-section page-part-one" style="margin-bottom: 0px;">
+                <div class="logo-wrapper">
+                    <img src="{% static 'AgriSmart/assets/logo.png' %}" alt="AgriSmart Logo" class="brand-logo">
+                    <h1 class="brand-name">AgriSmart</h1>
+                </div>
+                <p class="brand-tagline">La solution intelligente pour votre agriculture</p>
+            </div>
+
+            <!-- Section Formulaires -->
+            <div class="forms-section">
+                <!-- Onglets de navigation -->
+                <div class="tabs">
+                    <div class="tab-buttons">
+                        <button data-form="signin" id="loginTab" class="tab-btn active">
+                            <i class="fas fa-sign-in-alt"></i> Connexion
+                        </button>
+                        <button data-form="signup" id="registerTab" class="tab-btn">
+                            <i class="fas fa-user-plus"></i> Inscription
+                        </button>
+                        <div class="tab-underline"></div>
+                    </div>
+                </div>
+
+                <!-- Conteneur des formulaires -->
+                <div class="forms-container">
+                    <!-- Formulaire de connexion -->
+                    <form id="loginForm" class="auth-form active" style="max-height: 340px; overflow-y: auto; scrollbar-width: none;">
+                        <div class="form-header">
+                            <h2>Bienvenue</h2>
+                            <p>Connectez-vous à votre compte AgriSmart ✨😉</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="login-username">Nom d'utilisateur</label>
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text" name="username" id="login-username" placeholder="Nom d'utilisateur" required>
+                            </div>
+                            <div class="error-message"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="login-password">Mot de passe</label>
+                            <div class="input-group">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" name="password" id="login-password" placeholder="Mot de passe" required>
+                                <button type="button" class="toggle-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="error-message"></div>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="remember-me">
+                                <input type="checkbox">
+                                <span>Se souvenir de moi</span>
+                            </label>
+                            <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <span>Se connecter</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <!-- Formulaire d'inscription -->
+                    <form id="registerForm" class="auth-form" style="max-height: 340px; overflow-y: auto; scrollbar-width: none;">
+                        <div class="form-header">
+                            <h2>Créer un compte</h2>
+                            <p>Rejoignez la communauté AgriSmart 🌐📳</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="register-username">Nom d'utilisateur</label>
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text" name="username" id="register-username" placeholder="Nom d'utilisateur" required>
+                            </div>
+                            <div class="error-message"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="register-email">Adresse email</label>
+                            <div class="input-group">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" name="email" id="register-email" placeholder="E-mail" required>
+                            </div>
+                            <div class="error-message"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="register-password">Mot de passe</label>
+                            <div class="input-group">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" name="password" id="register-password" placeholder="Mot de passe" required>
+                                <button type="button" class="toggle-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="error-message"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="register-password-confirm">Confirmer le mot de passe</label>
+                            <div class="input-group">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" name="confirm_password" id="register-password-confirm" placeholder="Mot de passe (Confirmation)" required>
+                                <button type="button" class="toggle-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="error-message"></div>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="terms-checkbox">
+                                <input type="checkbox" required>
+                                <span>J'accepte les <a href="#">conditions d'utilisation</a></span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <span>S'inscrire</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Section Info -->
+            <div class="info-section page-part-two">
+                <div class="info-content">
+                    <div class="features-container">
+                        <div class="feature">
+                            <i class="fas fa-leaf"></i>
+                            <h3>Surveillance du Sol</h3>
+                            <p>Mesure en temps réel du pH, de l’humidité et de la température du sol.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-seedling"></i>
+                            <h3>Compatibilité des Cultures</h3>
+                            <p>Évaluation de la fertilité et de l’adaptation du sol à différents types de culture.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Suivi Local en Temps Réel</h3>
+                            <p>Accès immédiat aux données collectées dans la limite du réseau Wi-Fi local.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-bell"></i>
+                            <h3>Alertes par Plante</h3>
+                            <p>Signalement automatique des anomalies ou besoins propres à chaque culture.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-lightbulb"></i>
+                            <h3>Conseils Agronomiques</h3>
+                            <p>Suggestions sur les cultures et pratiques à privilégier selon les conditions du sol.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <h3>Tableau de Bord</h3>
+                            <p>Présentation claire de toutes les données essentielles sur une interface unique.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-cloud-sun-rain"></i>
+                            <h3>Prévisions Météo</h3>
+                            <p>Anticipation des conditions climatiques pour une meilleure planification.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-history"></i>
+                            <h3>Historique des Mesures</h3>
+                            <p>Consultation de l’évolution des paramètres du sol sur différentes périodes.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-wifi"></i>
+                            <h3>Fonctionnement Local</h3>
+                            <p>Transmission des données par Wi-Fi sans recours à un accès Internet mobile.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <h3>Gestion des Parcelles</h3>
+                            <p>Organisation et suivi différencié de plusieurs zones agricoles.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <h3>Données Sécurisées</h3>
+                            <p>Stockage local des informations pour plus de confidentialité</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-user-check"></i>
+                            <h3>Autonomie Agricole</h3>
+                            <p>Prise de décision facilitée par des données fiables et contextualisées.</p>
+                        </div>                        
+                        <div class="feature">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Suivi en Temps Réel</h3>
+                            <p>Surveillez vos cultures 24/7 depuis n'importe où</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <h3>Tableau de Bord</h3>
+                            <p>Visualisez toutes vos données en un coup d'œil</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-seedling"></i>
+                            <h3>Gestion des Cultures</h3>
+                            <p>Planifiez et optimisez vos cycles de culture</p>
+                        </div>
+                        <!-- Duplication pour le défilement infini -->
+                        <div class="feature">
+                            <i class="fas fa-leaf"></i>
+                            <h3>Surveillance du Sol</h3>
+                            <p>Mesure en temps réel du pH, de l’humidité et de la température du sol.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-seedling"></i>
+                            <h3>Compatibilité des Cultures</h3>
+                            <p>Évaluation de la fertilité et de l’adaptation du sol à différents types de culture.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Suivi Local en Temps Réel</h3>
+                            <p>Accès immédiat aux données collectées dans la limite du réseau Wi-Fi local.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-bell"></i>
+                            <h3>Alertes par Plante</h3>
+                            <p>Signalement automatique des anomalies ou besoins propres à chaque culture.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-lightbulb"></i>
+                            <h3>Conseils Agronomiques</h3>
+                            <p>Suggestions sur les cultures et pratiques à privilégier selon les conditions du sol.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <h3>Tableau de Bord</h3>
+                            <p>Présentation claire de toutes les données essentielles sur une interface unique.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-cloud-sun-rain"></i>
+                            <h3>Prévisions Météo</h3>
+                            <p>Anticipation des conditions climatiques pour une meilleure planification.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-history"></i>
+                            <h3>Historique des Mesures</h3>
+                            <p>Consultation de l’évolution des paramètres du sol sur différentes périodes.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-wifi"></i>
+                            <h3>Fonctionnement Local</h3>
+                            <p>Transmission des données par Wi-Fi sans recours à un accès Internet mobile.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <h3>Gestion des Parcelles</h3>
+                            <p>Organisation et suivi différencié de plusieurs zones agricoles.</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <h3>Données Sécurisées</h3>
+                            <p>Stockage local des informations pour plus de confidentialité</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-user-check"></i>
+                            <h3>Autonomie Agricole</h3>
+                            <p>Prise de décision facilitée par des données fiables et contextualisées.</p>
+                        </div>                        
+                        <div class="feature">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Suivi en Temps Réel</h3>
+                            <p>Surveillez vos cultures 24/7 depuis n'importe où</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <h3>Tableau de Bord</h3>
+                            <p>Visualisez toutes vos données en un coup d'œil</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-seedling"></i>
+                            <h3>Gestion des Cultures</h3>
+                            <p>Planifiez et optimisez vos cycles de culture</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="bubble-container"></div>
+    <!-- Système de notification -->
+    <div id="notification-container"></div>
+
+    <script>
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tab_Buttons = document.querySelectorAll('.tab-buttons');
+        const underline = document.querySelector('.tab-underline');
+
+        function updateUnderline(target) {
+            const tabRect = target.getBoundingClientRect();
+            const tab_Rect = target.getBoundingClientRect();
+            const containerRect = target.parentElement.getBoundingClientRect();
+            const offsetLeft = tabRect.left - containerRect.left;
+            if (offsetLeft <= 50) {
+                underline.style.transform = `translateX(${0}px)`;
+            }else {
+                underline.style.transform = `translateX(${100}%)`;
+            }
+            tab_Buttons.forEach(btn => {
+                underline.style.width = `${btn.width/2}px`;
+            })
+        }
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                updateUnderline(btn);
+            });
+        });
+
+        // Position initiale
+        window.addEventListener('load', () => {
+            const activeBtn = document.querySelector('.tab-btn.active');
+            if (activeBtn) updateUnderline(activeBtn);
+        });
+        setInterval(() => {
+            const activeBtn = document.querySelector('.tab-btn.active');
+            updateUnderline(activeBtn);
+        }, 100);
+
+
+
+        class Bubble {
+            constructor(container) {
+                this.container = container;
+                this.element = document.createElement('div');
+                this.element.className = 'bubble';
+                
+                // Random size between 20 and 80 pixels
+                this.size = Math.random() * 60 + 20;
+                
+                // Set initial position
+                this.x = Math.random() * (window.innerWidth - this.size);
+                this.y = Math.random() * (window.innerHeight - this.size);
+                
+                // Random velocities
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = (Math.random() - 0.5) * 4;
+                
+                // Random opacity between 0.2 and 0.6
+                this.opacity = Math.random() * 0.4 + 0.2;
+                
+                // Apply styles
+                this.element.style.width = `${this.size}px`;
+                this.element.style.height = `${this.size}px`;
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                this.element.style.backgroundColor = `rgba(0, 255, 0, ${this.opacity})`;
+                this.element.style.filter = 'blur(2px)';
+                
+                // Add to container
+                this.container.appendChild(this.element);
+            }
+            
+            update() {
+                // Update position
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // Bounce off walls
+                if (this.x <= 0 || this.x + this.size >= window.innerWidth) {
+                    this.vx *= -0.8; // Dampen velocity a bit for realistic effect
+                    this.x = this.x <= 0 ? 0 : window.innerWidth - this.size;
+                }
+                
+                if (this.y <= 0 || this.y + this.size >= window.innerHeight) {
+                    this.vy *= -0.8; // Dampen velocity a bit for realistic effect
+                    this.y = this.y <= 0 ? 0 : window.innerHeight - this.size;
+                }
+                
+                // Apply position
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+            }
+        }
+
+        class BubbleAnimation {
+            constructor(containerId, count = 30) {
+                this.container = document.getElementById(containerId);
+                this.bubbles = [];
+                this.count = count;
+                this.isRunning = false;
+                
+                // Create bubbles
+                this.createBubbles();
+                
+                // Start animation
+                this.start();
+                
+                // Handle window resize
+                window.addEventListener('resize', this.handleResize.bind(this));
+            }
+            
+            createBubbles() {
+                for (let i = 0; i < this.count; i++) {
+                    this.bubbles.push(new Bubble(this.container));
+                }
+            }
+            
+            animate() {
+                if (!this.isRunning) return;
+                
+                this.bubbles.forEach(bubble => bubble.update());
+                requestAnimationFrame(this.animate.bind(this));
+            }
+            
+            start() {
+                if (this.isRunning) return;
+                this.isRunning = true;
+                this.animate();
+            }
+            
+            stop() {
+                this.isRunning = false;
+            }
+            
+            handleResize() {
+                // Remove all bubbles
+                while (this.container.firstChild) {
+                    this.container.removeChild(this.container.firstChild);
+                }
+                
+                // Create new bubbles
+                this.bubbles = [];
+                this.createBubbles();
+            }
+        }
+
+        // Initialize the bubble animation when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new BubbleAnimation('bubble-container');
+        });
+
+        const infoLoaded = {
+            auth: "{% url 'auth_treatment' %}",
+        }
+    </script>
+    <script src="{% static 'AgriSmart/js/auth.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/notifications.js' %}"></script>
+</body>
+</html> 

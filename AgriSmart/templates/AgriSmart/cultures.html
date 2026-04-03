@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>AgriSmart - Cultures</title>
+    <link rel="stylesheet" href="{% static 'AgriSmart/styles/style.css' %}">
+    <link rel="stylesheet" href="{% static 'AgriSmart/styles/cultures.css' %}">
+    <link rel="stylesheet" href="{% static 'AgriSmart/styles/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'AgriSmart/styles/affichageModal.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<style>
+    .zone-select:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
+    }
+</style>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <img src="{% static 'AgriSmart/assets/logo.png' %}" alt="AgriSmart Logo">
+                <span>AgriSmart</span>
+            </div>
+            
+            <ul class="nav-links desktop-nav">
+                <li class="nav-item"><a href="{% url 'index' %}"><i class="fas fa-home"></i> <span class="nav-text">Accueil</span></a></li>
+                <li class="nav-item"><a href="{% url 'cultures' %}" class="active"><i class="fas fa-seedling"></i> <span class="nav-text">Cultures</span></a></li>
+                <li class="nav-item"><a href="{% url 'alertes' %}"><i class="fas fa-exclamation-triangle"></i> <span class="nav-text">Vos Alertes</span></a></li>
+                <li class="nav-item"><a href="{% url 'parametres' %}"><i class="fas fa-cog"></i> <span class="nav-text">Paramètres</span></a></li>
+            </ul>
+
+            <div class="hamburger-menu" onclick="toggleMobileMenu()">
+                <div class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu mobile coulissant -->
+        <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+        <div class="mobile-menu">
+            <div class="mobile-menu-header">
+                <h3><i class="fas fa-leaf"></i> Navigation</h3>
+                <button class="close-mobile-menu" onclick="closeMobileMenu()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="mobile-nav-links">
+                <li><a href="{% url 'index' %}"><i class="fas fa-home"></i> Accueil</a></li>
+                <li><a href="{% url 'cultures' %}" class="active"><i class="fas fa-seedling"></i> Cultures</a></li>
+                <li><a href="{% url 'alertes' %}"><i class="fas fa-exclamation-triangle"></i> Vos Alertes</a></li>
+                <li><a href="{% url 'parametres' %}"><i class="fas fa-cog"></i> Paramètres</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="cultures-container">
+        <!-- Section Tableau de bord -->
+        <div class="dashboard-section">
+            <div class="dashboard-header animate-on-scroll">
+                <h2>Données en temps réel</h2>
+                <div class="zone-controls">
+                    <div class="zone-selector">
+                        <select id="zone" class="zone-select">
+                            <option value="vide" selected disabled>Zone choisie</option>
+                            <option value="zone1">Zone 1</option>
+                            <option value="zone2">Zone 2</option>
+                            <option value="zone3">Zone 3</option>
+                            <option value="zone4">Zone 4</option>
+                        </select>
+                    </div>
+
+                    <button type="button" id="addCultureBtn" class="buttonDisabled">
+                        <i class="fas fa-plus"></i>
+                        Ajouter une culture
+                    </button>
+                </div>
+            </div>
+
+            <div class="sensor-grid">
+                <!-- Humidité du sol -->
+                <div class="sensor-card animate-on-scroll">
+                    <div class="sensor-header">
+                        <i class="fas fa-water"></i>
+                        <h3>Humidité du sol</h3>
+                    </div>
+                    <div class="sensor-value">
+                        <span id="soil-humidity">65</span>%
+                    </div>
+                    <div class="sensor-chart">
+                        <canvas id="soilHumidityChart"></canvas>
+                    </div>
+                    <div class="sensor-status-container">
+                        <button class="pause-btn" onclick="toggleChartRefresh('soilHumidityChart')" title="Mettre en pause le rafraîchissement">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                        <div class="sensor-status optimal">
+                            <i class="fas fa-check-circle"></i> Optimal
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Température de l'air -->
+                <div class="sensor-card animate-on-scroll">
+                    <div class="sensor-header">
+                        <i class="fas fa-thermometer-half"></i>
+                        <h3>Température</h3>
+                    </div>
+                    <div class="sensor-value">
+                        <span id="temperature">24</span>°C
+                    </div>
+                    <div class="sensor-chart">
+                        <canvas id="temperatureChart"></canvas>
+                    </div>
+                    <div class="sensor-status-container">
+                        <button class="pause-btn" onclick="toggleChartRefresh('temperatureChart')" title="Mettre en pause le rafraîchissement">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                        <div class="sensor-status warning">
+                            <i class="fas fa-exclamation-circle"></i> Attention
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Humidité de l'air -->
+                <div class="sensor-card animate-on-scroll">
+                    <div class="sensor-header">
+                        <i class="fas fa-cloud"></i>
+                        <h3>Humidité de l'air</h3>
+                    </div>
+                    <div class="sensor-value">
+                        <span id="air-humidity">55</span>%
+                    </div>
+                    <div class="sensor-chart">
+                        <canvas id="airHumidityChart"></canvas>
+                    </div>
+                    <div class="sensor-status-container">
+                        <button class="pause-btn" onclick="toggleChartRefresh('airHumidityChart')" title="Mettre en pause le rafraîchissement">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                        <div class="sensor-status optimal">
+                            <i class="fas fa-check-circle"></i> Optimal
+                        </div>
+                    </div>
+                </div>
+
+                <!-- pH du sol -->
+                <div class="sensor-card animate-on-scroll">
+                    <div class="sensor-header">
+                        <i class="fas fa-flask"></i>
+                        <h3>pH du sol</h3>
+                    </div>
+                    <div class="sensor-value">
+                        <span id="ph">6.5</span>
+                    </div>
+                    <div class="sensor-chart">
+                        <canvas id="phChart"></canvas>
+                    </div>
+                    <div class="sensor-status-container">
+                        <button class="pause-btn" onclick="toggleChartRefresh('phChart')" title="Mettre en pause le rafraîchissement">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                        <div class="sensor-status optimal">
+                            <i class="fas fa-check-circle"></i> Optimal
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NPK -->
+                <div class="sensor-card npk-card animate-on-scroll">
+                    <div class="sensor-header">
+                        <i class="fas fa-flask"></i>
+                        <h3>NPK</h3>
+                    </div>
+                    <div class="sensor-values">
+                        <div class="npk-value">
+                            <span class="npk-label">N:</span>
+                            <span id="nitrogen">120</span>
+                        </div>
+                        <div class="npk-value">
+                            <span class="npk-label">P:</span>
+                            <span id="phosphorus">45</span>
+                        </div>
+                        <div class="npk-value">
+                            <span class="npk-label">K:</span>
+                            <span id="potassium">80</span>
+                        </div>
+                    </div>
+                    <div class="sensor-chart">
+                        <canvas id="npkChart"></canvas>
+                    </div>
+                    <div class="sensor-status-container">
+                        <button class="pause-btn" onclick="toggleChartRefresh('npkChart')" title="Mettre en pause le rafraîchissement">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                        <div class="sensor-status optimal">
+                            <i class="fas fa-check-circle"></i> Optimal
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message lorsqu'aucune culture n'est sélectionnée -->
+        <div id="noCultureSelected" class="no-culture-selected">
+            <div class="no-culture-anim" aria-hidden="true">
+                <i class="fas fa-seedling"></i>
+            </div>
+            <p class="no-culture-text">aucune culture sélectionnée, sélectionnez-en une pour voir ses caractéristiques</p>
+        </div>
+
+        <!-- Section des recommandations - À supprimer car elles seront dans le modal -->
+        <div class="recommendations-section" style="display: none;">
+        </div>
+
+        <!-- Modal pour ajouter une culture -->
+        <div class="modal" id="addCultureModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-plus-circle"></i> Ajouter une culture</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <h3>Y a-t-il déjà une culture sur cette zone ?</h3>
+                    <div class="modal-buttons">
+                        <button id="btnYesCulture" class="btn primary-btn">
+                            <i class="fas fa-check"></i> Oui
+                        </button>
+                        <button id="btnNoCulture" class="btn secondary-btn">
+                            <i class="fas fa-times"></i> Non
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour culture existante -->
+        <div class="modal" id="existingCultureModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-edit"></i> Culture existante</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="existingCultureName">Nom de la culture :</label>
+                        <input type="text" id="existingCultureName" placeholder="Entrez le nom de la culture">
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="btn secondary-btn close-modal">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                        <button class="btn primary-btn" onclick="validateExistingCulture()">
+                            <i class="fas fa-check"></i> Valider
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour nouvelle culture -->
+        <div class="modal" id="newCultureModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-seedling"></i> Choisir une nouvelle culture</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="suggested-cultures"></div>
+                    <div class="cultures-grid">
+                        <!-- Carte culture - Laitue -->
+                        <div class="culture-card" data-culture="laitue">
+                            <img src="{% static 'AgriSmart/assets/images/laitue.png' %}" alt="Laitue">
+                            <div class="culture-badges">
+                                <span class="compatibility">95% compatible</span>
+                                <button class="info-btn" type="button">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                            <div class="culture-info">
+                                <h3>Laitue</h3>
+                                <p>Légume-feuille idéal pour les cultures en serre.</p>
+                                <button class="btn primary-btn" onclick="planterCulture('laitue')">
+                                    <i class="fas fa-seedling"></i> Planter
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Carte culture - Tomate -->
+                        <div class="culture-card" data-culture="tomate">
+                            <img src="{% static 'AgriSmart/assets/images/tomate.png' %}" alt="Tomate">
+                            <div class="culture-badges">
+                                <span class="compatibility">88% compatible</span>
+                                <button class="info-btn" type="button">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                            <div class="culture-info">
+                                <h3>Tomate</h3>
+                                <p>Fruit-légume polyvalent, riche en nutriments.</p>
+                                <button class="btn primary-btn" onclick="planterCulture('tomate')">
+                                    <i class="fas fa-seedling"></i> Planter
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Carte culture - Carotte -->
+                        <div class="culture-card" data-culture="carotte">
+                            <img src="{% static 'AgriSmart/assets/images/carotte.png' %}" alt="Carotte">
+                            <div class="culture-badges">
+                                <span class="compatibility">85% compatible</span>
+                                <button class="info-btn" type="button">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                            <div class="culture-info">
+                                <h3>Carotte</h3>
+                                <p>Légume-racine rustique adapté aux sols légers.</p>
+                                <button class="btn primary-btn" onclick="planterCulture('carotte')">
+                                    <i class="fas fa-seedling"></i> Planter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal d'information culture -->
+        <div class="modal" id="cultureInfoModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalCultureTitle"><i class="fas fa-leaf"></i> <span></span></h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <i class="fas fa-flask"></i>
+                            <div class="info-content">
+                                <h4>pH optimal</h4>
+                                <p id="modalPH"></p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-tint"></i>
+                            <div class="info-content">
+                                <h4>Humidité du sol</h4>
+                                <p id="modalSoilHumidity"></p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-cloud"></i>
+                            <div class="info-content">
+                                <h4>Humidité de l'air</h4>
+                                <p id="modalAirHumidity"></p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-thermometer-half"></i>
+                            <div class="info-content">
+                                <h4>Température</h4>
+                                <p id="modalTemperature"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="npk-info">
+                        <h4><i class="fas fa-vial"></i> Besoins en NPK</h4>
+                        <div class="npk-grid">
+                            <div class="npk-item">
+                                <i class="fas fa-leaf"></i>
+                                <div class="npk-content">
+                                    <h4>Azote (N)</h4>
+                                    <span id="modalNitrogen"></span>
+                                </div>
+                            </div>
+                            <div class="npk-item">
+                                <i class="fas fa-seedling"></i>
+                                <div class="npk-content">
+                                    <h4>Phosphore (P)</h4>
+                                    <span id="modalPhosphorus"></span>
+                                </div>
+                            </div>
+                            <div class="npk-item">
+                                <i class="fas fa-sun"></i>
+                                <div class="npk-content">
+                                    <h4>Potassium (K)</h4>
+                                    <span id="modalPotassium"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-widget-container">
+            <!-- Question Interface -->
+            <div id="ui-modal-1" class="ui-modal-overlay ui-hidden">
+                <div class="ui-modal-box">
+                    <button class="ui-close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2>Avez-vous déjà une culture en tête ?</h2>
+                    <div class="ui-btn-group">
+                        <button id="ui-yes-btn" class="ui-choice-btn ui-choice-yes">Oui</button>
+                        <button id="ui-no-btn" class="ui-choice-btn ui-choice-no">Non</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Culture Name Input Interface -->
+            <div id="ui-modal-2" class="ui-modal-overlay ui-hidden">
+                <div class="ui-modal-box">
+                    <button class="ui-close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2>Parfait !</h2>
+                    <div class="ui-input-group">
+                        <input 
+                            type="text" 
+                            id="ui-text-input" 
+                            placeholder="Entrez le nom de votre culture"
+                            class="ui-text-field"
+                        >
+                        <button id="ui-validate-btn" class="ui-primary-btn">Valider</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Interface -->
+            <div id="ui-modal-3" class="ui-modal-overlay ui-hidden">
+                <div class="ui-modal-box ui-modal-wide">
+                    <button class="ui-close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <!-- Refresh controls: countdown + pause/play -->
+                    <div class="ui-refresh-controls">
+                        <span id="ui-refresh-countdown" class="ui-refresh-countdown">Actualisation dans 10s</span>
+                        <button id="ui-refresh-toggle" class="ui-refresh-toggle" aria-label="Pause rafraîchissement">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                    </div>
+                    <h2>Découvrez nos suggestions</h2>
+                    <div class="ui-search-container">
+                        <div class="ui-search-input-wrapper">
+                            <i class="fas fa-search ui-search-icon"></i>
+                            <input 
+                                type="text" 
+                                id="ui-search-input" 
+                                placeholder="Rechercher par nom..."
+                                class="ui-search-input"
+                            >
+                        </div>
+                        <div class="ui-threshold-container">
+                            <label for="ui-threshold-input" class="ui-threshold-label">
+                                Compatibilité minimale: <span id="ui-threshold-value">80%</span>
+                            </label>
+                            <input type="range" id="ui-threshold-input" class="ui-threshold-input" min="0" max="100" step="1" value="80">
+                        </div>
+                    </div>
+                    <div class="ui-grid" id="ui-products-grid">
+                        <!-- Products will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plant Information Interface -->
+            <div id="ui-modal-4" class="ui-modal-overlay ui-hidden">
+                <div class="ui-modal-box ui-modal-wide">
+                    <button class="ui-close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="ui-content-wrapper" id="ui-info-container">
+                        <!-- Plant information will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section des détails de la culture sélectionnée -->
+        <div class="selected-culture-details" id="selectedCultureDetails">
+            <div class="details-header">
+                <h3><i class="fas fa-seedling"></i> Culture en cours</h3>
+            </div>
+            <div class="details-content">
+                <div class="culture-image">
+                    <img id="selectedCultureImage" src="" alt="Culture sélectionnée">
+                </div>
+                <div class="culture-info-container">
+                    <h4 id="selectedCultureName"></h4>
+                    <p id="selectedCultureDescription" class="culture-description"></p>
+                    <div class="culture-actions">
+                        <button id="moreOptionsBtn" class="more-options-btn">
+                            <i class="fas fa-chart-line"></i>
+                            Infos supplémentaires
+                        </button>
+                        <button id="checkConditionsBtn" class="check-conditions-btn">
+                            <i class="fas fa-search"></i>
+                            Scanner l'état
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour les statistiques et conseils de la plante -->
+        <div id="plantStatsModal" class="modal plant-stats-modal">
+            <div class="modal-content plant-stats-content">
+                <div class="modal-header">
+                    <h2 id="plantStatsTitle"><i class="fas fa-info-circle"></i> Statistiques de la plante</h2>
+                    <span class="close plant-stats-close">&times;</span>
+                </div>
+                <div class="modal-body plant-stats-body">
+                    <div class="stats-section">
+                        <h3><i class="fas fa-chart-line"></i> Conditions optimales</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-flask"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-label">pH du sol</span>
+                                    <span class="stat-value" id="statPH"></span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-thermometer-half"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Température</span>
+                                    <span class="stat-value" id="statTemperature"></span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-tint"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Humidité sol</span>
+                                    <span class="stat-value" id="statSoilHumidity"></span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-cloud"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Humidité air</span>
+                                    <span class="stat-value" id="statAirHumidity"></span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="conseils-section">
+                        <h3><i class="fas fa-lightbulb"></i> Conseils pratiques</h3>
+                        <div class="conseils-grid" id="conseilsContainer">
+                            <!-- Conseils générés dynamiquement -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content animate-on-scroll">
+            <div class="footer-section">
+                <h4>AgriSmart</h4>
+                <p>Solution d'agriculture intelligente</p>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>Email: contact@agrismart.com</p>
+                <p>Tél: + 229 90 90 62 18</p>
+            </div>
+            <div class="footer-section">
+                <h4>Liens rapides</h4>
+                <ul>
+                    <li><a href="#">Aide</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Mentions légales</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 AgriSmart. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <div id="bubble-container"></div>
+    <!-- Système de notification -->
+    <div id="notification-container"></div>
+
+    <script src="{% static 'AgriSmart/js/allConfig.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/sensorManager.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/dashboard.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/auto-alerts.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/culture-modal.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/alertes-server.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/cultures.js' %}"></script>
+    <script>
+        function checkZoneSelection() {
+            const select = document.querySelector('.zone-select');
+            const button = document.getElementById('addCultureBtn');
+            if (!select || !button) return;
+
+            if (select.value === 'vide') {
+                select.style.border = '1px solid gray';
+                button.style.pointerEvents = "none";
+                select.style.color = "black";
+                select.style.backgroundColor = "#d3d3d3";
+
+                // Retire la classe active et ajoute la désactivée
+                button.classList.remove('add-culture-btn');
+                button.classList.add('buttonDisabled');
+            } else {
+                select.style.border = '1px solid green';
+                button.style.pointerEvents = "";
+                select.style.color = "black";
+                select.style.backgroundColor = "rgba(245, 255, 245, 0.925)";
+                select.style.fontWeight = "bold";
+
+                // Retire la classe désactivée et remet la classe active
+                button.classList.remove('buttonDisabled');
+                button.classList.add('add-culture-btn');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const select = document.querySelector('.zone-select');
+            if (!select) return;
+            checkZoneSelection();
+            select.addEventListener('change', checkZoneSelection);
+        });
+
+        // Fonctions pour le menu hamburger
+        function toggleMobileMenu() {
+            const hamburger = document.querySelector('.hamburger-menu');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const overlay = document.querySelector('.mobile-menu-overlay');
+            
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Cacher le bouton hamburger quand le menu est ouvert
+            if (mobileMenu.classList.contains('active')) {
+                hamburger.classList.add('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                hamburger.classList.remove('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeMobileMenu() {
+            const hamburger = document.querySelector('.hamburger-menu');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const overlay = document.querySelector('.mobile-menu-overlay');
+            
+            hamburger.classList.remove('active');
+            hamburger.classList.remove('hidden');
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Fermer le menu si on clique sur un lien
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', closeMobileMenu);
+            });
+        });
+        class Bubble {
+            constructor(container) {
+                this.container = container;
+                this.element = document.createElement('div');
+                this.element.className = 'bubble';
+                
+                // Random size between 20 and 80 pixels
+                this.size = Math.random() * 60 + 20;
+                
+                // Set initial position
+                this.x = Math.random() * (window.innerWidth - this.size);
+                this.y = Math.random() * (window.innerHeight - this.size);
+                
+                // Random velocities
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = (Math.random() - 0.5) * 4;
+                
+                // Random opacity between 0.2 and 0.6
+                this.opacity = Math.random() * 0.4 + 0.2;
+                
+                // Apply styles
+                this.element.style.width = `${this.size}px`;
+                this.element.style.height = `${this.size}px`;
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                this.element.style.backgroundColor = `rgba(0, 255, 0, ${this.opacity})`;
+                this.element.style.filter = 'blur(2px)';
+                
+                // Add to container
+                this.container.appendChild(this.element);
+            }
+            
+            update() {
+                // Update position
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // Bounce off walls
+                if (this.x <= 0 || this.x + this.size >= window.innerWidth) {
+                    this.vx *= -0.8; // Dampen velocity a bit for realistic effect
+                    this.x = this.x <= 0 ? 0 : window.innerWidth - this.size;
+                }
+                
+                if (this.y <= 0 || this.y + this.size >= window.innerHeight) {
+                    this.vy *= -0.8; // Dampen velocity a bit for realistic effect
+                    this.y = this.y <= 0 ? 0 : window.innerHeight - this.size;
+                }
+                
+                // Apply position
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+            }
+        }
+
+        class BubbleAnimation {
+            constructor(containerId, count = 1) {
+                this.container = document.getElementById(containerId);
+                this.bubbles = [];
+                this.count = count;
+                this.isRunning = false;
+                
+                // Create bubbles
+                this.createBubbles();
+                
+                // Start animation
+                this.start();
+                
+                // Handle window resize
+                window.addEventListener('resize', this.handleResize.bind(this));
+            }
+            
+            createBubbles() {
+                for (let i = 0; i < this.count; i++) {
+                    this.bubbles.push(new Bubble(this.container));
+                }
+            }
+            
+            animate() {
+                if (!this.isRunning) return;
+                
+                this.bubbles.forEach(bubble => bubble.update());
+                requestAnimationFrame(this.animate.bind(this));
+            }
+            
+            start() {
+                if (this.isRunning) return;
+                this.isRunning = true;
+                this.animate();
+            }
+            
+            stop() {
+                this.isRunning = false;
+            }
+            
+            handleResize() {
+                // Remove all bubbles
+                while (this.container.firstChild) {
+                    this.container.removeChild(this.container.firstChild);
+                }
+                
+                // Create new bubbles
+                this.bubbles = [];
+                this.createBubbles();
+            }
+        }
+
+        // Initialize the bubble animation when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new BubbleAnimation('bubble-container');
+        });
+        
+        window.addEventListener('load', function () {
+            // Récupère les données depuis localStorage
+            const userData = localStorage.getItem("user-connexion-data");
+
+            // Vérifie si les données existent
+            if (!userData) {
+                window.location.href = "/auth";
+            return;
+            }
+
+            try {
+                const parsedData = JSON.parse(userData);
+                if (
+                    parsedData.username &&
+                    parsedData.password &&
+                    typeof parsedData.remember === "boolean"
+                ) {
+                    console.log("Utilisateur authentifié via localStorage");
+                } else {
+                    window.location.href = "/auth";
+                }
+            } catch (e) {
+                window.location.href = "/auth";
+            }
+        });
+    </script>
+    <script src="{% static 'AgriSmart/js/notifications.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/affichageModal.js' %}"></script>
+</body>
+</html>

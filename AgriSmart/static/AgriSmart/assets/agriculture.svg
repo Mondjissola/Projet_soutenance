@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="600px" viewBox="0 0 800 600" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <!-- Background -->
+        <circle cx="400" cy="300" r="250" fill="#E8F5E9"/>
+        
+        <!-- Plant Pot -->
+        <path d="M350,450 L450,450 L470,500 L330,500 Z" fill="#8D6E63"/>
+        
+        <!-- Main Stem -->
+        <path d="M400,450 C400,450 400,300 400,300" stroke="#2E7D32" stroke-width="8" stroke-linecap="round"/>
+        
+        <!-- Leaves -->
+        <!-- Left Side Leaves -->
+        <path d="M400,400 C350,380 300,400 320,350 C340,300 380,320 400,350" fill="#4CAF50"/>
+        <path d="M400,350 C350,330 300,350 320,300 C340,250 380,270 400,300" fill="#4CAF50"/>
+        <path d="M400,300 C350,280 300,300 320,250 C340,200 380,220 400,250" fill="#4CAF50"/>
+        
+        <!-- Right Side Leaves -->
+        <path d="M400,400 C450,380 500,400 480,350 C460,300 420,320 400,350" fill="#4CAF50"/>
+        <path d="M400,350 C450,330 500,350 480,300 C460,250 420,270 400,300" fill="#4CAF50"/>
+        <path d="M400,300 C450,280 500,300 480,250 C460,200 420,220 400,250" fill="#4CAF50"/>
+        
+        <!-- Small decorative leaves -->
+        <circle cx="400" cy="250" r="8" fill="#2E7D32"/>
+        <circle cx="400" cy="300" r="8" fill="#2E7D32"/>
+        <circle cx="400" cy="350" r="8" fill="#2E7D32"/>
+        
+        <!-- Leaf veins -->
+        <path d="M320,350 C340,340 380,345 400,350" stroke="#2E7D32" stroke-width="2"/>
+        <path d="M320,300 C340,290 380,295 400,300" stroke="#2E7D32" stroke-width="2"/>
+        <path d="M320,250 C340,240 380,245 400,250" stroke="#2E7D32" stroke-width="2"/>
+        
+        <path d="M480,350 C460,340 420,345 400,350" stroke="#2E7D32" stroke-width="2"/>
+        <path d="M480,300 C460,290 420,295 400,300" stroke="#2E7D32" stroke-width="2"/>
+        <path d="M480,250 C460,240 420,245 400,250" stroke="#2E7D32" stroke-width="2"/>
+    </g>
+</svg> 

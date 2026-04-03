@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>AgriSmart - Alertes</title>
+    <link rel="stylesheet" href="{% static 'AgriSmart/styles/style.css' %}">
+    <link rel="stylesheet" href="{% static 'AgriSmart/styles/alertes.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<style>
+    body:focus{
+        outline: none;
+    }
+</style>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <img src="{% static 'AgriSmart/assets/logo.png' %}" alt="AgriSmart Logo">
+                <span>AgriSmart</span>
+            </div>
+            
+            <ul class="nav-links desktop-nav">
+                <li class="nav-item"><a href="{% url 'index' %}"><i class="fas fa-home"></i> <span class="nav-text">Accueil</span></a></li>
+                <li class="nav-item"><a href="{% url 'cultures' %}"><i class="fas fa-seedling"></i> <span class="nav-text">Cultures</span></a></li>
+                <li class="nav-item"><a href="{% url 'alertes' %}" class="active"><i class="fas fa-exclamation-triangle"></i> <span class="nav-text">Vos Alertes</span></a></li>
+                <li class="nav-item"><a href="{% url 'parametres' %}"><i class="fas fa-cog"></i> <span class="nav-text">Paramètres</span></a></li>
+            </ul>
+
+            <div class="hamburger-menu" onclick="toggleMobileMenu()">
+                <div class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu mobile coulissant -->
+        <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+        <div class="mobile-menu">
+            <div class="mobile-menu-header">
+                <h3><i class="fas fa-leaf"></i> Navigation</h3>
+                <button class="close-mobile-menu" onclick="closeMobileMenu()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="mobile-nav-links">
+                <li><a href="{% url 'index' %}"><i class="fas fa-home"></i> Accueil</a></li>
+                <li><a href="{% url 'cultures' %}"><i class="fas fa-seedling"></i> Cultures</a></li>
+                <li><a href="{% url 'alertes' %}" class="active"><i class="fas fa-exclamation-triangle"></i> Vos Alertes</a></li>
+                <li><a href="{% url 'parametres' %}"><i class="fas fa-cog"></i> Paramètres</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="alertes-container">
+        <div class="alertes-header">
+            <div class="header-title">
+                <h2><i class="fas fa-bell"></i> Centre de notifications</h2>
+                <p class="header-subtitle">Alertes automatiques de votre système agricole</p>
+            </div>
+            <div class="header-actions">
+                <button class="mark-all-read">
+                    <i class="fas fa-check-double"></i> Tout marquer comme lu
+                </button>
+                <button class="delete-all-alerts">
+                    <i class="fas fa-trash-alt"></i> Effacer toutes
+                </button>
+            </div>
+        </div>
+
+        <div class="alertes-content">
+            <div class="alertes-sidebar animate-on-scroll">
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-filter"></i> Filtres</h3>
+                    
+                    <div class="filter-group">
+                        <h4>Statut</h4>
+                        <label class="checkbox-container">
+                            <input type="checkbox" checked id="filter-unread"> Non lues
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="filter-read"> Alertes lues
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <h4>Type d'alerte</h4>
+                        <label class="checkbox-container">
+                            <input type="checkbox" checked> Critiques
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" checked> Avertissements
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" checked> Informations
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <h4>Zone</h4>
+                        <label class="checkbox-container">
+                            <input type="checkbox" checked> Zone 1
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" checked> Zone 2
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" checked> Zone 3
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" checked> Zone 4
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <h4>Période</h4>
+                        <select class="period-select">
+                            <option value="today">Aujourd'hui</option>
+                            <option value="week">Cette semaine</option>
+                            <option value="month">Ce mois</option>
+                            <option value="all">Toutes les alertes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alertes-list">
+                <!-- Les alertes seront chargées dynamiquement par JavaScript -->
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Chargement des alertes...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content animate-on-scroll">
+            <div class="footer-section">
+                <h4>AgriSmart</h4>
+                <p>Solution d'agriculture intelligente</p>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>Email: contact@agrismart.com</p>
+                <p>Tél: + 229 90 90 62 18</p>
+            </div>
+            <div class="footer-section">
+                <h4>Liens rapides</h4>
+                <ul>
+                    <li><a href="#">Aide</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Mentions légales</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 AgriSmart. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <div id="bubble-container"></div>
+    <div id="notification-container"></div>
+
+    <script src="{% static 'AgriSmart/js/alertes-server.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/auto-alerts.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/allConfig.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/notifications.js' %}"></script>
+    <script>
+        // Fonctions pour le menu hamburger
+        function toggleMobileMenu() {
+            const hamburger = document.querySelector('.hamburger-menu');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const overlay = document.querySelector('.mobile-menu-overlay');
+            
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            if (mobileMenu.classList.contains('active')) {
+                hamburger.classList.add('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                hamburger.classList.remove('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeMobileMenu() {
+            const hamburger = document.querySelector('.hamburger-menu');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const overlay = document.querySelector('.mobile-menu-overlay');
+            
+            hamburger.classList.remove('active');
+            hamburger.classList.remove('hidden');
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', closeMobileMenu);
+            });
+        });
+
+        class Bubble {
+            constructor(container) {
+                this.container = container;
+                this.element = document.createElement('div');
+                this.element.className = 'bubble';
+                
+                this.size = Math.random() * 60 + 20;
+                this.x = Math.random() * (window.innerWidth - this.size);
+                this.y = Math.random() * (window.innerHeight - this.size);
+                this.vx = (Math.random() - 0.5) * 2.5;
+                this.vy = (Math.random() - 0.5) * 2.5;
+                this.opacity = Math.random() * 0.4 + 0.2;
+                
+                this.element.style.width = `${this.size}px`;
+                this.element.style.height = `${this.size}px`;
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                this.element.style.backgroundColor = `rgba(0, 255, 0, ${this.opacity})`;
+                this.element.style.filter = 'blur(4px)';
+                
+                this.container.appendChild(this.element);
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                if (this.x <= 0 || this.x + this.size >= window.innerWidth) {
+                    this.vx *= -0.8;
+                    this.x = this.x <= 0 ? 0 : window.innerWidth - this.size;
+                }
+                
+                if (this.y <= 0 || this.y + this.size >= window.innerHeight) {
+                    this.vy *= -0.8;
+                    this.y = this.y <= 0 ? 0 : window.innerHeight - this.size;
+                }
+                
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+            }
+        }
+
+        class BubbleAnimation {
+            constructor(containerId, count = 10) {
+                this.container = document.getElementById(containerId);
+                this.bubbles = [];
+                this.count = count;
+                this.isRunning = false;
+                
+                this.createBubbles();
+                this.start();
+                
+                window.addEventListener('resize', this.handleResize.bind(this));
+            }
+            
+            createBubbles() {
+                for (let i = 0; i < this.count; i++) {
+                    this.bubbles.push(new Bubble(this.container));
+                }
+            }
+            
+            animate() {
+                if (!this.isRunning) return;
+                
+                this.bubbles.forEach(bubble => bubble.update());
+                requestAnimationFrame(this.animate.bind(this));
+            }
+            
+            start() {
+                if (this.isRunning) return;
+                this.isRunning = true;
+                this.animate();
+            }
+            
+            stop() {
+                this.isRunning = false;
+            }
+            
+            handleResize() {
+                while (this.container.firstChild) {
+                    this.container.removeChild(this.container.firstChild);
+                }
+                
+                this.bubbles = [];
+                this.createBubbles();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new BubbleAnimation('bubble-container');
+        });
+
+        window.addEventListener('load', function () {
+            // Récupère les données depuis localStorage
+            const userData = localStorage.getItem("user-connexion-data");
+
+            // Vérifie si les données existent
+            if (!userData) {
+                window.location.href = "/auth";
+            return;
+            }
+
+            try {
+                const parsedData = JSON.parse(userData);
+                if (
+                    parsedData.username &&
+                    parsedData.password &&
+                    typeof parsedData.remember === "boolean"
+                ) {
+                    console.log("Utilisateur authentifié via localStorage");
+                } else {
+                    window.location.href = "/auth";
+                }
+            } catch (e) {
+                window.location.href = "/auth";
+            }
+        });
+    </script>
+</body>
+</html>

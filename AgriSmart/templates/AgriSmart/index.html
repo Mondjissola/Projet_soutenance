@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>AgriSmart - Accueil</title>
+    <link rel="stylesheet" href="{% static 'AgriSmart/styles/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<style>
+    body:focus{
+        outline: none;
+    }
+    body {
+        background: linear-gradient(to bottom, white, rgba(11, 75, 14, 0.219));
+    }
+</style>
+<body>
+    <!-- Fond flouté -->
+    <div class="background-blur"></div>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <img src="{% static 'AgriSmart/assets/logo.png' %}" alt="AgriSmart Logo">
+                <span>AgriSmart</span>
+            </div>
+            
+            <ul class="nav-links desktop-nav">
+                <li class="nav-item"><a href="{% url 'index' %}" class="active"><i class="fas fa-home"></i> <span class="nav-text">Accueil</span></a></li>
+                <li class="nav-item"><a href="{% url 'cultures' %}"><i class="fas fa-seedling"></i> <span class="nav-text">Cultures</span></a></li>
+                <li class="nav-item"><a href="{% url 'alertes' %}"><i class="fas fa-exclamation-triangle"></i> <span class="nav-text">Vos Alertes</span></a></li>
+                <li class="nav-item"><a href="{% url 'parametres' %}"><i class="fas fa-cog"></i> <span class="nav-text">Paramètres</span></a></li>
+            </ul>
+
+            <div class="hamburger-menu" onclick="toggleMobileMenu()">
+                <div class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu mobile coulissant -->
+        <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+        <div class="mobile-menu">
+            <div class="mobile-menu-header">
+                <h3><i class="fas fa-leaf"></i> Navigation</h3>
+                <button class="close-mobile-menu" onclick="closeMobileMenu()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="mobile-nav-links">
+                <li><a href="{% url 'index' %}" class="active"><i class="fas fa-home"></i> Accueil</a></li>
+                <li><a href="{% url 'cultures' %}"><i class="fas fa-seedling"></i> Cultures</a></li>
+                <li><a href="{% url 'alertes' %}"><i class="fas fa-exclamation-triangle"></i> Vos Alertes</a></li>
+                <li><a href="{% url 'parametres' %}"><i class="fas fa-cog"></i> Paramètres</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="home-container">
+        <section class="welcome-section">
+            <div class="welcome-content">
+                <h1 class="welcome-title">Bienvenue sur AgriSmart</h1>
+                <p class="welcome-message">Pour une agriculture connectée et intelligente</p>
+                <!--<div class="app-logo">
+                    <img src="{% static 'AgriSmart/assets/logo.png' %}" alt="Logo Application AgriSmart" class="main-logo">
+                </div>!-->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content animate-on-scroll">
+            <div class="footer-section">
+                <h4>AgriSmart</h4>
+                <p>Solution d'agriculture intelligente pour une planète plus verte.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>Email : contact@agrismart.com</p>
+                <p>Tél : + 229 90 90 62 18</p>
+            </div>
+            <div class="footer-section">
+                <h4>Liens rapides</h4>
+                <ul>
+                    <li><a href="#">Aide</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Mentions légales</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 AgriSmart. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <div id="bubble-container"></div>
+    <!-- Système de notification -->
+    <div id="notification-container"></div>
+    <script src="{% static 'AgriSmart/js/notifications.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/allConfig.js' %}"></script>
+    <script src="{% static 'AgriSmart/js/utils.js' %}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            showWelcomeMessage("consultez votre section 'Cultures' pour voir les cultures que vous avez en cours de production.", 7000);
+        });
+
+        // Fonctions pour le menu hamburger
+        function toggleMobileMenu() {
+            const hamburger = document.querySelector('.hamburger-menu');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const overlay = document.querySelector('.mobile-menu-overlay');
+            
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Cacher le bouton hamburger quand le menu est ouvert
+            if (mobileMenu.classList.contains('active')) {
+                hamburger.classList.add('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                hamburger.classList.remove('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeMobileMenu() {
+            const hamburger = document.querySelector('.hamburger-menu');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const overlay = document.querySelector('.mobile-menu-overlay');
+            
+            hamburger.classList.remove('active');
+            hamburger.classList.remove('hidden');
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Fermer le menu si on clique sur un lien
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', closeMobileMenu);
+            });
+        });
+        class Bubble {
+            constructor(container) {
+                this.container = container;
+                this.element = document.createElement('div');
+                this.element.className = 'bubble';
+                
+                // Random size between 20 and 80 pixels
+                this.size = Math.random() * 60 + 20;
+                
+                // Set initial position
+                this.x = Math.random() * (window.innerWidth - this.size);
+                this.y = Math.random() * (window.innerHeight - this.size);
+                
+                // Random velocities
+                this.vx = (Math.random() - 0.5) * 2.5;
+                this.vy = (Math.random() - 0.5) * 2.5;
+                
+                // Random opacity between 0.2 and 0.6
+                this.opacity = Math.random() * 0.4 + 0.2;
+                
+                // Apply styles
+                this.element.style.width = `${this.size}px`;
+                this.element.style.height = `${this.size}px`;
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                this.element.style.backgroundColor = `rgba(0, 255, 0, ${this.opacity})`;
+                this.element.style.filter = 'blur(4px)';
+                
+                // Add to container
+                this.container.appendChild(this.element);
+            }
+            
+            update() {
+                // Update position
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // Bounce off walls
+                if (this.x <= 0 || this.x + this.size >= window.innerWidth) {
+                    this.vx *= -0.8; // Dampen velocity a bit for realistic effect
+                    this.x = this.x <= 0 ? 0 : window.innerWidth - this.size;
+                }
+                
+                if (this.y <= 0 || this.y + this.size >= window.innerHeight) {
+                    this.vy *= -0.8; // Dampen velocity a bit for realistic effect
+                    this.y = this.y <= 0 ? 0 : window.innerHeight - this.size;
+                }
+                
+                // Apply position
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+            }
+        }
+
+        class BubbleAnimation {
+            constructor(containerId, count = 8) {
+                this.container = document.getElementById(containerId);
+                this.bubbles = [];
+                this.count = count;
+                this.isRunning = false;
+                
+                // Create bubbles
+                this.createBubbles();
+                
+                // Start animation
+                this.start();
+                
+                // Handle window resize
+                window.addEventListener('resize', this.handleResize.bind(this));
+            }
+            
+            createBubbles() {
+                for (let i = 0; i < this.count; i++) {
+                    this.bubbles.push(new Bubble(this.container));
+                }
+            }
+            
+            animate() {
+                if (!this.isRunning) return;
+                
+                this.bubbles.forEach(bubble => bubble.update());
+                requestAnimationFrame(this.animate.bind(this));
+            }
+            
+            start() {
+                if (this.isRunning) return;
+                this.isRunning = true;
+                this.animate();
+            }
+            
+            stop() {
+                this.isRunning = false;
+            }
+            
+            handleResize() {
+                // Remove all bubbles
+                while (this.container.firstChild) {
+                    this.container.removeChild(this.container.firstChild);
+                }
+                
+                // Create new bubbles
+                this.bubbles = [];
+                this.createBubbles();
+            }
+        }
+
+        // Initialize the bubble animation when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new BubbleAnimation('bubble-container');
+        });
+
+        window.addEventListener('load', function () {
+            // Récupère les données depuis localStorage
+            const userData = localStorage.getItem("user-connexion-data");
+
+            // Vérifie si les données existent
+            if (!userData) {
+                window.location.href = "/auth";
+            return;
+            }
+
+            try {
+                const parsedData = JSON.parse(userData);
+                if (
+                    parsedData.username &&
+                    parsedData.password &&
+                    typeof parsedData.remember === "boolean"
+                ) {
+                    console.log("Utilisateur authentifié via localStorage");
+                } else {
+                    window.location.href = "/auth";
+                }
+            } catch (e) {
+                window.location.href = "/auth";
+            }
+        });
+    </script>
+</body>
+</html> 

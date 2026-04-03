@@ -1,0 +1,251 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paramètres - AgriSmart</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'AgriSmart/styles/style.css' %}">
+    <link rel="stylesheet" href="{% static 'AgriSmart/styles/parametres.css' %}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <img src="{% static 'AgriSmart/assets/logo.png' %}" alt="AgriSmart Logo">
+                <span>AgriSmart</span>
+            </div>
+            
+            <div class="navbar-right">
+                <div class="user-profile">
+                    <i class="fas fa-user"></i>
+                    <span id="username-display">Utilisateur</span>
+                </div>
+                <a href="{% url 'index' %}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Retour</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="settings-wrapper">
+            <!-- En-tête de la page -->
+            <div class="page-header">
+                <h1><i class="fas fa-cog"></i> Paramètres</h1>
+                <p>Gérez vos informations personnelles et préférences</p>
+            </div>
+
+            <!-- Informations du compte -->
+            <section class="settings-card">
+                <div class="card-header">
+                    <i class="fas fa-user-circle"></i>
+                    <h2>Informations du compte</h2>
+                </div>
+
+                <!-- Nom d'utilisateur -->
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label>Nom d'utilisateur</label>
+                        <span class="setting-desc">Votre nom d'affichage sur la plateforme</span>
+                    </div>
+                    <div class="setting-control">
+                        <div class="input-wrapper">
+                            <input type="text" id="username" disabled>
+                            <div class="control-buttons">
+                                <button class="btn-edit" onclick="editUsername()">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-save hidden" id="save-username" onclick="saveUsername()">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn-cancel hidden" id="cancel-username" onclick="cancelEditUsername()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mot de passe -->
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label>Mot de passe</label>
+                        <span class="setting-desc">Modifiez votre mot de passe de connexion</span>
+                    </div>
+                    <div class="setting-control">
+                        <button class="btn-primary" onclick="editPassword()">
+                            <i class="fas fa-key"></i>
+                            <span>Changer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Formulaire de changement de mot de passe -->
+                <div class="password-section hidden" id="password-form">
+                    <div class="password-inputs">
+                        <div class="input-group">
+                            <label>Mot de passe actuel</label>
+                            <div class="password-input">
+                                <input type="password" id="current-password" placeholder="Entrez votre mot de passe actuel">
+                                <button type="button" onclick="togglePassword('current-password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Nouveau mot de passe</label>
+                            <div class="password-input">
+                                <input type="password" id="new-password" placeholder="Entrez votre nouveau mot de passe">
+                                <button type="button" onclick="togglePassword('new-password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Confirmer le nouveau mot de passe</label>
+                            <div class="password-input">
+                                <input type="password" id="confirm-password" placeholder="Confirmez votre nouveau mot de passe">
+                                <button type="button" onclick="togglePassword('confirm-password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn-success" onclick="savePassword()">
+                            <i class="fas fa-save"></i>
+                            <span>Sauvegarder</span>
+                        </button>
+                        <button class="btn-secondary" onclick="cancelEditPassword()">
+                            <i class="fas fa-times"></i>
+                            <span>Annuler</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sécurité -->
+            <section class="settings-card">
+                <div class="card-header">
+                    <i class="fas fa-shield-alt"></i>
+                    <h2>Sécurité</h2>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label>Connexion automatique</label>
+                        <span class="setting-desc">Restez connecté après fermeture du navigateur</span>
+                    </div>
+                    <div class="setting-control">
+                        <div class="status-indicator" id="remember-status">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Activé</span>
+                        </div>
+                        <div class="toggle-buttons">
+                            <button class="btn-danger" id="clear-remember-btn" onclick="clearRememberMe()">
+                                <i class="fas fa-times"></i>
+                                <span>Désactiver</span>
+                            </button>
+                            <button class="btn-primary hidden" id="enable-remember-btn" onclick="enableRememberMe()">
+                                <i class="fas fa-check"></i>
+                                <span>Activer</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Préférences -->
+            <section class="settings-card">
+                <div class="card-header">
+                    <i class="fas fa-bell"></i>
+                    <h2>Notifications</h2>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label>Alertes de capteurs</label>
+                        <span class="setting-desc">Notifications pour les alertes des capteurs agricoles</span>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="alerts-notifications" checked>
+                            <span class="slider"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label>Recommandations de culture</label>
+                        <span class="setting-desc">Conseils et suggestions pour vos cultures</span>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="plant-notifications" checked>
+                            <span class="slider"></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Zone de danger -->
+            <section class="settings-card danger-card">
+                <div class="card-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h2>Attention !</h2>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <label>Supprimer le compte</label>
+                        <span class="setting-desc danger-text">Cette action est irréversible. Toutes vos données seront supprimées.</span>
+                    </div>
+                    <div class="setting-control">
+                        <button class="btn-danger" onclick="deleteAccount()">
+                            <i class="fas fa-trash"></i>
+                            <span>Supprimer</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modal de confirmation -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Confirmation</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">Êtes-vous sûr de vouloir effectuer cette action ?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+                <button class="btn-danger" id="confirm-action">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="notifications-container" id="notification-container"></div>
+
+    <!-- Scripts -->
+    <script src="{% static 'AgriSmart/js/parametres.js' %}"></script>
+    <script>
+        // Fonctions pour le menu mobile (si nécessaire)
+        function toggleMobileMenu() {}
+        function closeMobileMenu() {}
+    </script>
+</body>
+</html>
